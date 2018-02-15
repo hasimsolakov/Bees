@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <title><?=$this->name?></title>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+          <script
+    			  src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"
+    			  integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="
+    			  crossorigin="anonymous"></script>
+          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+          <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+        </head>
+        <body>
+        <div class="container">
+            <?php if($this->file_exists) { ?>
+                <div>Filesize: <?=round($this->size / 1024, 2);?> KBs</div>
+                <a href="/file/parse?delete=<?=urlencode($this->file_path);?>" class="btn btn-danger pull-right">Delete File</a>
+                <a href="/file/upload" class="btn btn-primary pull-right" >Go to Upload</a>
+                <div class="col-lg-6">
+                    <textarea rows="35" cols="65"><?=$this->content?></textarea>
+                </div>
+                <div class="col-lg-6">
+                    <?php //var_dump($this->matches['question']);?>
+                    <ul style="height: 35em;overflow:auto;" class="list-group">
+                    <?php for($i = 0; $i < count($this->matches); $i++) { ?>
+                        <li class="list-group-item"><pre><?=$i + 1?>. <?=$this->matches[$i]['question'];?></pre>
+                        Answers: 
+                            <?php for($j = 0; $j < count($this->matches[$i]['answers']); $j++) { ?>
+                                <li class="list-group-item <?=($this->matches[$i]['answers'][$j]['isCorrect'] ? 'list-group-item-success' : '');?>"><?=$this->matches[$i]['answers'][$j]['text'];?></pre>
+                            <?php } ?>
+                        </li>
+                    <?php } ?>
+                    </ul>
+                </div>
+
+            <?php } else { ?>
+                <h1>File not found!</h1>
+            <?php } ?>
+        </div>
+        <script type="text/javascript">
+            jQuery(document).ready(function(){
+            });
+        </script>
+        </body>
+        </html>

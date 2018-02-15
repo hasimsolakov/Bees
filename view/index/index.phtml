@@ -1,0 +1,125 @@
+<?php   
+    
+            function fetchData() {
+                $stmt = queryList("SELECT * FROM data", array());
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+            }
+            
+            function populateData($xbeeData) {
+                $savedCols = 0;
+                foreach($xbeeData as $xbeeIndex => $dataArray) {
+                   $stmt = queryList("INSERT INTO data(xbee_number, temperature, humidity) VALUES(:xbee_number, :temperature, :humidity)",
+                            array("xbee_number" => $xbeeIndex + 1, 
+                            "temperature" => (!isset($dataArray['temp']) ? 0.0 : $dataArray['temp']), 
+                            "humidity" => (!isset($dataArray['hum']) ? 0.0 : $dataArray['hum']))); 
+                   $savedCols += $stmt->rowCount() ;
+                }
+        
+                if($savedCols > 0) {
+                    echo "Data saved!";
+                }
+            }
+            
+                function getConnection(){
+        $username="beeslbsr_bees";
+        $password="b33srocktheworld";
+        $host="localhost";
+        $db="beeslbsr_bees_environment";
+        $connection = new PDO("mysql:dbname=$db;host=$host", $username, $password);
+        return $connection;
+    }
+    
+    function queryList($sql, $args){
+        $connection = getConnection();
+        $stmt = $connection->prepare($sql);
+        $stmt->execute($args);
+        return $stmt;
+    }
+        $humidity = $_POST['h'];
+        $xbeeData = array();
+        if(!empty($humidity)) {
+            if(!is_array($humidity)) {
+                $humidity = array($humidity);
+            }
+            
+            foreach($humidity as $xbeeIndex => $humidityValue) {
+                if(!isset($xbeeData[$xbeeIndex])) {
+                    $xbeeData[$xbeeIndex] = array("hum" => $humidityValue);
+                } else {
+                    $xbeeData[$xbeeIndex]["hum"] = $humidityValue;
+                }
+            }
+        }
+        
+        $temp = $_POST['t'];
+        if(!empty($temp)) {
+            if(!is_array($temp)) {
+                $temp = array($temp);
+            }
+            
+            foreach($temp as $xbeeIndex => $tempValue) {
+                if(!isset($xbeeData[$xbeeIndex])) {
+                    $xbeeData[$xbeeIndex] = array("temp" => $tempValue);
+                } else {
+                    $xbeeData[$xbeeIndex]["temp"] = $tempValue;
+                }
+            }
+        }
+        
+        if(!empty($xbeeData)) {
+            populateData($xbeeData);
+        } else { 
+            $data = fetchData();
+        ?>
+        
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <title>Bees</title>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+          <script
+    			  src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"
+    			  integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="
+    			  crossorigin="anonymous"></script>
+          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+          <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+        </head>
+        <body>
+        <div class="container">
+            <?php if(empty($data)) { ?>
+                <h2>No data!</h2>
+            <?php } else { ?>
+                <div class="table-responsive">
+                    <table id="bees-datatable" class="table">
+                        <thead>
+                            <th>Xbee#</th>
+                            <th>Humidity</th>
+                            <th>Temperature</th>
+                            <th>Time</th>
+                        </thead>
+                        <tbody>
+                        <?php foreach($data as $xbeeData) { ?>
+                            <tr>
+                                <td><?=$xbeeData['xbee_number']?></td>
+                                <td><?=$xbeeData['humidity']?></td>
+                                <td><?=$xbeeData['temperature']?></td>
+                                <td><?=$xbeeData['time_received']?></td>
+                            </tr>
+                        <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php } ?>
+        </div>
+        <script type="text/javascript">
+            jQuery(document).ready(function(){
+                jQuery("#bees-datatable").DataTable();
+            });
+        </script>
+        </body>
+        </html>
+        <?php
+}

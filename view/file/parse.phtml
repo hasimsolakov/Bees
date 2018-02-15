@@ -1,0 +1,46 @@
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <title><?=$this->name?></title>
+          <meta charset="utf-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1">
+          <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+          <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+          <script
+    			  src="https://code.jquery.com/ui/1.12.0/jquery-ui.min.js"
+    			  integrity="sha256-eGE6blurk5sHj+rmkfsGYeKyZx3M4bG+ZlFyA7Kns7E="
+    			  crossorigin="anonymous"></script>
+          <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+          <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+        </head>
+        <body>
+            <?php 
+                if($this->delete) {
+                    if(!$this->file_exists) { ?>
+                        <div class="alert alert-danger">File was already deleted!</div>
+                        <a href="/file/upload" class="btn btn-primary">Go To Upload</a>
+                    <?php } else {
+                        if($this->deletedOK) { ?>
+                            <div class="alert alert-success">File Deleted</div>
+                            <a href="/file/upload" class="btn btn-primary">Go To Upload</a>
+                        <?php } else { ?>
+                            <div class="alert alert-danger">Could not delete File!</div>
+                            <a href="/file/upload" class="btn btn-primary">Go To Upload</a>
+                        <?php } ?>
+                    <?php } ?>
+                <?php } else { ?>
+                        <div class="container">
+                            <?php if($this->written) { ?>
+                                <div class="alert alert-success" >File saved!</div>
+                                <a href="/file/parse?delete=<?=urlencode($this->tempname);?>" class="btn btn-danger pull-right">Delete File</a>
+                                <a href="/file/upload" class="btn btn-primary pull-right" >Go to Upload</a>
+                            <?php } else { ?>
+                                <div class="alert alert-danger">Could not save file!</div>
+                                <a href="/file/upload" class="btn btn-primary pull-right" >Go to Upload</a>
+                            <?php } ?>
+                                <h1>Content of the file provided: </h1>
+                                <pre><?=$this->content?></pre>
+                        </div>
+                    <?php } ?>
+            </body>
+            </html>
